@@ -1,28 +1,47 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <input type="text" @input="getAdvice($event)" :value="searchAdvice" />
+    <ul v-if="searchAdvice.length">
+      <li v-for="adviceItem in searchedAdvices" :key="adviceItem.id">
+        {{ adviceItem.advice }}
+      </li>
+    </ul>
+    <button @click="test">TEST</button>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
 export default {
   name: 'App',
-  components: {
-    HelloWorld
-  }
-}
+  data() {
+    return {
+      searchAdvice: '',
+      searchedAdvices: [],
+    };
+  },
+  methods: {
+    test() {
+      console.log(process.env)
+    },
+    async getAdvice(event) {
+      if (event.target.value === ' ') {
+        event.target.value = '';
+      }
+      this.searchAdvice = event.target.value;
+      if (this.searchAdvice.length > 0) {
+        const res = await fetch(
+          `https://api.adviceslip.com/advice/search/${this.searchAdvice}`
+        );
+        const advices = await res.json();
+        this.searchedAdvices = advices.slips;
+      }
+    },
+  },
+};
 </script>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+<style lang="scss">
+body {
+  background-color: darken(#00acdc, 15%);
 }
 </style>
